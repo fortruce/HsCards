@@ -1,20 +1,25 @@
+import db from './db';
 import express from 'express';
+import bodyParser from 'body-parser';
+
+const DB_CONNECT = 'mongodb://localhost/hscards';
 
 const app = express();
+app.use(bodyParser.json());
 
-app.get('/api', (req, res) => {
-  res.json({
-    shouts: [
-      'Hello World!',
-      'This is React and Webpack...',
-      'They make development fun',
-      'Another shout'
-    ]
-  });
-});
-
-app.listen(8080, function(err) {
+db.connect(DB_CONNECT, (err) => {
   if (err)
     return console.log(err);
-  console.log('running on localhost:8080');
+
+  // cards requires database connection to already be established
+  var cards = require('./cards');
+
+  // set up routes
+  app.use('/api/cards', cards);
+
+  app.listen(8080, function(err) {
+    if (err)
+      return console.log(err);
+    console.log('running on localhost:8080');
+  });
 });
