@@ -8,7 +8,8 @@ import * as components from './components';
 import * as reducers from './reducers';
 
 const {
-  Application
+  Application,
+  CardSearch
 } = components;
 
 const reducer = combineReducers(reducers);
@@ -33,7 +34,9 @@ export default class Root extends React.Component {
 function renderRoutes(history) {
   return (
     <Router history={ history }>
-      <Route path='/' component={ Application } />
+      <Route path='/' component={ Application }>
+        <Route path='search' component={ CardSearch } />
+      </Route>
     </Router>
   );
 }
