@@ -14,8 +14,11 @@ db.connect(DB_CONNECT, (err) => {
   // cards requires database connection to already be established
   var cards = require('./cards');
 
-  // set up routes
-  app.use('/api/cards', cards);
+  // set up api routes
+  const api = express.Router();
+  api.use('/cards', cards);
+
+  app.use('/api', api);
 
   app.listen(8080, function(err) {
     if (err)
