@@ -1,11 +1,16 @@
+
 import gulp from 'gulp';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import nodemon from 'nodemon';
 import path from 'path';
+import fs from 'fs';
+import { exec } from 'child_process';
 
 import configs from './webpack.config';
 const [ frontendConfig, backendConfig ] = configs;
+
+const DB_DATA = path.join(__dirname, 'data');
 
 gulp.task('dev', () => {
   new WebpackDevServer(webpack(frontendConfig), {
@@ -30,7 +35,26 @@ gulp.task('backend-watch', () => {
   });
 });
 
-gulp.task('server', ['backend-watch'], () => {
+gulp.task('init-db', ['start-db'], (done) => {
+  exec(`rm -rf ${DB_DATA}`, (err) => {
+    if (err)
+      return done(err);
+
+    fs.mkdir(DB_DATA, (err) => {
+      if (err)
+        return done(err);
+
+      exec('node utils/importdb.js', done);
+    });
+  });
+});
+
+// DB will be quit when ctrl+C is given to gulp
+gulp.task('start-db', () => {
+  exec(`mongod --dbpath ${DB_DATA}`);
+});
+
+gulp.task('server', ['init-db', 'backend-watch'], () => {
   nodemon({
     execMap: {
       js: 'node'

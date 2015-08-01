@@ -2,8 +2,9 @@ var fs = require('fs');
 var assign = require('object-assign');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+var path = require('path');
 
-var data = JSON.parse(fs.readFileSync('allsets.json').toString());
+var data = JSON.parse(fs.readFileSync(path.join(__dirname, 'allsets.json')).toString());
 
 data = Object.keys(data).map(function(set) {
   return data[set].map(function(card) {
