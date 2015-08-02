@@ -7,6 +7,11 @@ const DB_CONNECT = 'mongodb://localhost/hscards';
 const app = express();
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  console.log(`REQUEST: ${req.url}`);
+  next();
+});
+
 db.connect(DB_CONNECT, (err) => {
   if (err)
     return console.log(err);
