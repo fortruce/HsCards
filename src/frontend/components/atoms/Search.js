@@ -1,6 +1,10 @@
 import React, { PropTypes } from 'react';
 
 export default class Search extends React.Component {
+  static propTypes = {
+    onSearch: PropTypes.func.isRequired
+  }
+
   constructor(props) {
     super(props);
 
@@ -11,7 +15,7 @@ export default class Search extends React.Component {
 
   onKeyUp = (e) => {
     if (e.keyCode === 13)
-      console.log('enter');
+      this.props.onSearch(this.state.value.trim());
   }
 
   onChange = (e) => {
