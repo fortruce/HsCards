@@ -9,7 +9,8 @@ import * as reducers from './reducers';
 
 const {
   Application,
-  CardSearch
+  Explore,
+  Cards
 } = components;
 
 const reducer = combineReducers(reducers);
@@ -35,7 +36,9 @@ function renderRoutes(history) {
   return (
     <Router history={ history }>
       <Route component={ Application }>
-        <Route path='search' component={ CardSearch } />
+        <Route path='search' component={ Explore }>
+          <Route path=':search' component={ Cards } />
+        </Route>
       </Route>
       <Redirect from='/' to='/search' />
     </Router>
