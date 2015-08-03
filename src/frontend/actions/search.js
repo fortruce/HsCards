@@ -6,11 +6,17 @@ export function searchCards(search) {
     fetch(`/api/cards/${search}`)
       .then(res => res.json())
       .then(json => {
-        console.log(json);
         dispatch({
           type: constants.SEARCH_CARDS,
           cards: json
-        })
+        });
       });
+  }
+}
+
+export function searchChange(search) {
+  return {
+    type: constants.SEARCH_CHANGE,
+    search
   }
 }
