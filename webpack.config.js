@@ -38,9 +38,14 @@ var frontendConfig = assign({}, defaultConfig, {
   module: {
     loaders: [
       {
-        text: /\.js$/,
+        test: /\.js$/,
         include: path.join(__dirname, 'src', 'frontend'),
         loaders: ['react-hot', 'babel?stage=0']
+      },
+      {
+        test: /\.scss$/,
+        include: path.join(__dirname, 'src', 'frontend', 'scss'),
+        loaders: ['style', 'css', 'sass']
       }
     ]
   }
