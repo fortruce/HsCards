@@ -1,1 +1,2 @@
 export const SEARCH_CARDS = 'SEARCH_CARDS';
+export const SEARCH_CHANGE = 'SEARCH_CHANGE';
