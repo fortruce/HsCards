@@ -19,9 +19,15 @@ export default class Cards extends React.Component {
     const { cards } = this.props;
     return (
       <div>
-        <h1>Cards: { this.props.params.search }</h1>
-        <ul>
-          { cards.map(card => <li key={card.id}><Card {...card} /></li>) }
+        <ul style={{
+          listStyle: 'none',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+          { cards.map(card => <li key={card.id}>
+                                  <Card {...card} />
+                              </li>) }
         </ul>
       </div>
     );

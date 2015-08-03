@@ -28,7 +28,6 @@ export default class Explore extends React.Component {
 
     return (
       <div>
-        <h1>Search</h1>
         <Search
           onSearch={ this.onSearch }
           value={ this.props.search }
