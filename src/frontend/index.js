@@ -1,3 +1,5 @@
+require('./scss/main.scss');
+
 import React from 'react';
 import Root from './Root';
 import HashHistory from 'react-router/lib/HashHistory';
