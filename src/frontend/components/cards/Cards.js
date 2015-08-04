@@ -22,8 +22,7 @@ export default class Cards extends React.Component {
         <ul style={{
           listStyle: 'none',
           display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between'
+          flexWrap: 'wrap'
         }}>
           { cards.map(card => <li key={card.id}>
                                   <Card {...card} />
