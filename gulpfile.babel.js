@@ -54,7 +54,7 @@ gulp.task('start-db', () => {
   exec(`mongod --dbpath ${DB_DATA}`);
 });
 
-gulp.task('server', ['start-db', 'backend-watch'], () => {
+gulp.task('server', ['init-db', 'backend-watch'], () => {
   nodemon({
     execMap: {
       js: 'node'
