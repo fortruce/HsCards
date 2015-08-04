@@ -7,7 +7,7 @@ const router = express.Router();
 const col = db.get().collection('cards');
 const cardFilter = {
   type: { '$in': ['weapon', 'minion', 'spell'] },
-  set: { '$ne': 'Debug' }
+  set: { '$nin': ['Debug', 'Credits'] }
 };
 
 function error(res, err) {
