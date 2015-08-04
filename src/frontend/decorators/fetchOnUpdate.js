@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import assign from 'object-assign';
-import shallowEqualScalar from 'redux/lib/utils/shallowEqualScalar';
+import shallowEqual from 'shallowequal';
 
 function mapParams(keys, params) {
   return keys.reduce((acc, key) => {
@@ -25,7 +25,7 @@ export default function fetchOnUpdate(paramKeys, fn) {
         const params = mapParams(paramKeys, this.props.params);
         const prevParams = mapParams(paramKeys, prevProps.params);
 
-        if (!shallowEqualScalar(params, prevParams))
+        if (!shallowEqual(params, prevParams))
           fn(params, this.props.actions);
       }
 
