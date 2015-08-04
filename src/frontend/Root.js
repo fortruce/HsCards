@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import { Router, Route, Redirect } from 'react-router';
 import { Provider } from 'react-redux';
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import { devTools, persistState } from 'redux-devtools';
+import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import thunk from 'redux-thunk';
 
 import * as components from './components';
@@ -14,7 +16,12 @@ const {
 } = components;
 
 const reducer = combineReducers(reducers);
-const finalCreateStore = applyMiddleware(thunk)(createStore);
+const finalCreateStore = compose(
+  applyMiddleware(thunk),
+  devTools(),
+  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
+  createStore
+);
 const store = finalCreateStore(reducer);
 
 export default class Root extends React.Component {
@@ -25,9 +32,16 @@ export default class Root extends React.Component {
   render() {
     const { history } = this.props;
     return (
-      <Provider store={ store }>
-        { renderRoutes.bind(null, history) }
-      </Provider>
+      <div>
+        <Provider store={ store }>
+          { renderRoutes.bind(null, history) }
+        </Provider>
+        <DebugPanel top right bottom>
+          <DevTools store={ store }
+                    monitor={ LogMonitor }
+                    select={ state => state.search.filters } />
+        </DebugPanel>
+      </div>
     );
   }
 }
