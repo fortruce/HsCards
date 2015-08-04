@@ -2,12 +2,21 @@ import React, { PropTypes } from 'react';
 import { Router, Route, Redirect } from 'react-router';
 import { Provider } from 'react-redux';
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
-import { devTools, persistState } from 'redux-devtools';
-import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import thunk from 'redux-thunk';
+import assign from 'object-assign';
 
 import * as components from './components';
 import * as reducers from './reducers';
+
+// initialize redux devtools
+let DEVTOOLS;
+if (__DEV__) {
+  DEVTOOLS = assign(
+    {},
+    require('redux-devtools/lib/react'),
+    require('redux-devtools')
+  );
+}
 
 const {
   Application,
@@ -16,12 +25,19 @@ const {
 } = components;
 
 const reducer = combineReducers(reducers);
-const finalCreateStore = compose(
-  applyMiddleware(thunk),
-  devTools(),
-  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
-  createStore
-);
+let finalCreateStore;
+// conditionally load redux devtools
+if (__DEV__) {
+  const { devTools, persistState } = DEVTOOLS;
+  finalCreateStore = compose(
+    applyMiddleware(thunk),
+    devTools(),
+    persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)),
+    createStore
+  );
+} else {
+  finalCreateStore = applyMiddleware(thunk)(createStore);
+}
 const store = finalCreateStore(reducer);
 
 export default class Root extends React.Component {
@@ -31,17 +47,39 @@ export default class Root extends React.Component {
 
   render() {
     const { history } = this.props;
-    return (
-      <div>
-        <Provider store={ store }>
-          { renderRoutes.bind(null, history) }
-        </Provider>
-        <DebugPanel top right bottom>
+    let elements = [
+      <Provider store={ store } key="main">
+        { renderRoutes.bind(null, history) }
+      </Provider>
+    ];
+    if (__DEV__) {
+      const { DevTools, DebugPanel, LogMonitor } = DEVTOOLS;
+      elements.push(
+        <DebugPanel key="debugPanel"
+                    getStyle={ () => ({
+                      background: 'black',
+                      overflow: 'scroll',
+                      opacity: 0.85,
+                      fontSize: 16,
+                      color: 'white',
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 999,
+                      position: 'fixed',
+                      maxWidth: '400px'
+                    })}>
           <DevTools store={ store }
                     monitor={ LogMonitor }
-                    select={ state => state.search.filters } />
+                    select={ state => ({
+                      search: state.search.search,
+                      filters: state.search.filters
+                    })}/>
         </DebugPanel>
-      </div>
+      );
+    }
+    return (
+      <div>{ elements }</div>
     );
   }
 }

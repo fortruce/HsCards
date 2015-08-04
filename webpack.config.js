@@ -8,6 +8,8 @@ var path = require('path');
 var assign = require('object-assign');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const DEBUG = process.env.NODE_ENV !== 'production';
+
 var defaultConfig = {
   devtool: 'sourcemap'
 };
@@ -27,6 +29,9 @@ var frontendConfig = assign({}, defaultConfig, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
+    new webpack.DefinePlugin({
+      __DEV__: DEBUG
+    }),
     new HtmlWebpackPlugin({
       title: 'Skele',
       filename: 'index.html',
