@@ -40,9 +40,15 @@ export default function urlStorage(storageKey, serializeFn, deserializeFn) {
     );
 
     DecoratedComponent.prototype.serialize = function(data) {
+      let query = assign({}, this.props.location.query);
+      const serializedData = serializeFn(data);
+      if (serializedData)
+        query = assign(query, { [storageKey]: serializedData });
+      else
+        delete query[storageKey];
       this.context.router.transitionTo(
         this.props.location.pathname,
-        assign({}, this.props.location.query, { [storageKey]: serializeFn(data) })
+        query
       );
     }
 
