@@ -4,7 +4,6 @@ import assign from 'object-assign';
 import Search from '../atoms/Search';
 import ClassToggles from './ClassToggles';
 import { searchChange } from '../../actions/search';
-import Test from './Test';
 
 // colors from http://wowwiki.wikia.com/Class_colors
 const COLORS = {
@@ -38,7 +37,6 @@ export default class CardSearch extends React.Component {
 
     return (
       <div>
-        <Test {...this.props} />
         <Search
           onSearch={ this.onSearch }
           value={ this.props.search }
