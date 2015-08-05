@@ -2,9 +2,17 @@ import React, { PropTypes } from 'react';
 import assign from 'object-assign';
 
 import Toggle from '../atoms/Toggle';
+import urlStorage from '../../decorators/urlStorage';
 
 const URL_SEP = '+';
 
+@urlStorage('classes',
+  (data) => {
+    return data.join(URL_SEP);
+  },
+  (data) => {
+    return data ? data.split(URL_SEP) : [];
+  })
 export default class ClassToggles extends React.Component {
   static contextTypes = {
     router: PropTypes.object.isRequired
@@ -24,43 +32,28 @@ export default class ClassToggles extends React.Component {
   }
 
   isToggled = (id) => {
-    const { query } = this.props.location;
-    if (query && query.classes) {
-      // classes=drui,mage,warr indicates druid mage and warrior toggled
-      return query.classes.split(URL_SEP).indexOf(id) !== -1;
-    }
-    // by default all are toggled
-    return true;
+    return this.props.data.length === 0 || this.props.data.indexOf(id) !== -1;
   }
 
   toggle = (id, toggled) => {
-    const { pathname, query } = this.props.location;
-    // extract the classes from the query
-    // if there is not a classes query present, then all are toggled
-    let heroes = ( query && query.classes && query.classes.split(URL_SEP)) ||
-                 this.props.toggles.map(toggle => toggle.id);
-
-    if (toggled) {
-      heroes.push(id);
+    let data = [...this.props.data];
+    if (toggled){
+      data.push(id);
+      // if all are enabled, then use shortcut of none explictly enabled = all enabled
+      if (data.length === toggled.length)
+        data = [];
+    }
+    else if (data.length === 0) {
+      // default is all enabled when none are specified, to disable 
+      // just 1 in this case we must explictly enable all of the other toggles
+      data = this.props.toggles
+              .map(({id}) => id)
+              .filter(did => did !== id);
     }
     else {
-      heroes = heroes.filter(hId => hId !== id);
+      data = data.filter(did => did !== id);
     }
-
-    // if all classes are toggled revert to no classes specified
-    if (heroes.length === this.props.toggles.length) {
-      let newQuery = assign({}, query);
-      delete newQuery['classes'];
-      return this.context.router.transitionTo(
-        pathname,
-        newQuery
-      );
-    }
-
-    this.context.router.transitionTo(
-      pathname,
-      assign({}, query, { classes: heroes.join(URL_SEP) })
-    );
+    this.serialize(data);
   }
 
   render() {
