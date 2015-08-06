@@ -8,6 +8,26 @@ export function uStorage(defaultState) {
         router: PropTypes.object.isRequired
       }
 
+      componentWillMount() {
+        // initialize urlState with query params & defaultState
+        const { query } = this.props.location;
+        this.setState(query ? assign({}, defaultState, query) : defaultState);
+      }
+
+      componentWillReceiveProps(nProps) {
+        const { query: newQuery } = nProps.location;
+        const { query: oldQuery } = this.props.location;
+        if (shallowEqual(newQuery, oldQuery))
+          return;
+        if (newQuery) {
+          this.setState({
+
+          })
+        } else {
+          this.setState()
+        }
+      }
+
       render() {
         let { query } = this.props.location;
         const data = assign({}, defaultState, query) || defaultState;
@@ -21,21 +41,20 @@ export function uStorage(defaultState) {
     DecoratedComponent.contextTypes = assign(
       {}, DecoratedComponent.contextTypes, { router: PropTypes.object.isRequired }
     );
-    DecoratedComponent.prototype.state = defaultState;
-    DecoratedComponent.prototype.setState = function(nState) {
-      // TODO don't delete from acc[key] in reducer since we've already merged previous state
-      // need to determine if !nState[key] (key is not in new state)
-      //   AND key is not in old state (this.state)
-      //   THEN delete key from acc so it's no longer in new query
-      this.state = assign({}, this.state, nState);
+    DecoratedComponent.prototype.componentWillMount = function() {
+      console.log('overwritten will mount');
+    }
+    DecoratedComponent.prototype.urlState = defaultState;
+    // redirect to the the merge of the old state with the new state
+    // query state (redirected state) should remove deepEqual params that are
+    // equivalent to the default state
+    DecoratedComponent.prototype.setUrlState = function(nState) {
+      console.log('set urlState:', nState);
+      // merge previous state with new state
+      this.urlState = assign({}, this.urlState, nState);
       let { query } = this.props.location;
-      query = assign({}, query, this.state);
-      // delete from query all shape keys that aren't in current state
-      Object.keys(defaultState).reduce((acc, key) => {
-        if (!nState[key] && acc[key])
-          delete acc[key];
-        return acc;
-      }, query);
+      // merge new state with query params
+      query = assign({}, query, this.urlState);
       this.context.router.transitionTo(
         this.props.location.pathname,
         query
