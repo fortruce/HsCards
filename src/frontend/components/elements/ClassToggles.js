@@ -8,10 +8,12 @@ const URL_SEP = '+';
 
 @urlStorage('classes',
   (data) => {
-    return data.join(URL_SEP);
+    // return data.join(URL_SEP);
+    return JSON.stringify(data);
   },
   (data) => {
-    return data ? data.split(URL_SEP) : [];
+    // return data ? data.split(URL_SEP) : [];
+    return JSON.parse(data);
   })
 export default class ClassToggles extends React.Component {
   static contextTypes = {
@@ -53,7 +55,7 @@ export default class ClassToggles extends React.Component {
     else {
       data = data.filter(did => did !== id);
     }
-    this.serialize(data);
+    this.setState(data);
   }
 
   render() {
