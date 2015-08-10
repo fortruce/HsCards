@@ -6,15 +6,9 @@ import urlStorage from '../../decorators/urlStorage';
 
 const URL_SEP = '+';
 
-@urlStorage('classes',
-  (data) => {
-    // return data.join(URL_SEP);
-    return JSON.stringify(data);
-  },
-  (data) => {
-    // return data ? data.split(URL_SEP) : [];
-    return JSON.parse(data);
-  })
+@urlStorage({
+  classes: []
+})
 export default class ClassToggles extends React.Component {
   static contextTypes = {
     router: PropTypes.object.isRequired
@@ -34,28 +28,22 @@ export default class ClassToggles extends React.Component {
   }
 
   isToggled = (id) => {
-    return this.props.data.length === 0 || this.props.data.indexOf(id) !== -1;
+    return this.props.classes.length === 0 || this.props.classes.indexOf(id) !== -1;
   }
 
   toggle = (id, toggled) => {
-    let data = [...this.props.data];
-    if (toggled){
-      data.push(id);
-      // if all are enabled, then use shortcut of none explictly enabled = all enabled
-      if (data.length === toggled.length)
-        data = [];
+    const ids = this.props.toggles.map(toggle => toggle.id);
+    let classes = [...this.props.classes];
+    if (classes.length === 0)
+      classes = ids;
+    if (toggled) {
+      classes.push(id);
+      if (classes.length === ids.length)
+        classes = null;
     }
-    else if (data.length === 0) {
-      // default is all enabled when none are specified, to disable 
-      // just 1 in this case we must explictly enable all of the other toggles
-      data = this.props.toggles
-              .map(({id}) => id)
-              .filter(did => did !== id);
-    }
-    else {
-      data = data.filter(did => did !== id);
-    }
-    this.setState(data);
+    else
+      classes.splice(classes.indexOf(id), 1);
+    this.props.change({ classes });
   }
 
   render() {
