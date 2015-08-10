@@ -20,13 +20,14 @@ export default function urlStorage(defaultState) {
       }
 
       componentWillReceiveProps(nProps) {
-        // if new query is received in props, update the state with
-        // new query param state
+        // load query params into state from location props
         const { query } = nProps.location;
         this.setState({ urlState: query || {} });
       }
 
       _changeUrlState(nState) {
+        // merge the new state with the previous state, then
+        // remove all keys where new state === null
         let mergedState = assign({}, this.state.urlState, nState);
         mergedState = Object.keys(mergedState).reduce((o, key) => {
           if (nState[key] !== null)
@@ -48,9 +49,6 @@ export default function urlStorage(defaultState) {
         );
       }
     }
-    DecoratedComponent.contextTypes = assign(
-      {}, DecoratedComponent.contextTypes, { router: PropTypes.object.isRequired }
-    );
     return UStorageComponent;
   }
 }

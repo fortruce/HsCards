@@ -5,6 +5,8 @@ import Search from '../atoms/Search';
 import ClassToggles from './ClassToggles';
 import { searchChange } from '../../actions/search';
 
+import urlStorage from '../../decorators/urlStorage';
+
 // colors from http://wowwiki.wikia.com/Class_colors
 const COLORS = {
   druid: '#ff7d0a',
@@ -17,7 +19,11 @@ const COLORS = {
   warlock: '#9482c9',
   warrior: '#c79c6e'
 };
+const COLORS_LEN = Object.keys(COLORS).length;
 
+@urlStorage({
+  classes: Object.keys(COLORS)
+})
 export default class CardSearch extends React.Component {
   static contextTypes = {
     router: PropTypes.object.isRequired
@@ -30,11 +36,30 @@ export default class CardSearch extends React.Component {
   }
 
   onSearchChange = (search) => {
-    this.props.dispatch(searchChange(search, this.props.location.query));
+    this.props.dispatch(searchChange(search));
+  }
+
+  _toggle = (id, toggled) => {
+    let classes = [...this.props.classes];
+    if (!toggled)
+      classes.splice(classes.indexOf(id), 1);
+    else {
+      classes.push(id);
+      if (classes.length === COLORS_LEN)
+        classes = null;
+    }
+    this.props.change({ classes });
   }
 
   render() {
-
+    const toggles = Object.keys(COLORS).map(hero => {
+      return {
+        label: hero,
+        color: COLORS[hero],
+        toggled: this.props.classes.indexOf(hero) !== -1 || this.props.classes.length === 0,
+        toggle: (toggled) => { this._toggle(hero, toggled) }
+      }
+    });
     return (
       <div>
         <Search
@@ -42,11 +67,7 @@ export default class CardSearch extends React.Component {
           value={ this.props.search }
           onChange={ this.onSearchChange } />
         <ClassToggles
-          toggles={ Object.keys(COLORS).map(hero => ({
-            id: hero.slice(0,4),
-            label: hero,
-            color: COLORS[hero]
-          })) }
+          toggles={ toggles }
           { ...this.props } />
       </div>
     );
